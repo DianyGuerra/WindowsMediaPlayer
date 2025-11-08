@@ -1,1 +1,24 @@
+# Build results
+bin/
+obj/
+Debug/
+Release/
+.vs/
+*.user
+*.suo
+*.cache
+*.log
+*.dbmdl
+*.pdb
+*.tmp
+
+# Packages
+packages/
+*.nupkg
+*.nuspec
+
+# Others
+*.exe
+*.dll
+*.local
 
