@@ -36,13 +36,16 @@
             this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnLoadFile = new System.Windows.Forms.Button();
+            this.lstboxSongsList = new System.Windows.Forms.ListBox();
+            this.lblSongsList = new System.Windows.Forms.Label();
+            this.btnUpdateList = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             this.SuspendLayout();
             // 
             // panelBarras
             // 
             this.panelBarras.BackColor = System.Drawing.Color.Black;
-            this.panelBarras.Location = new System.Drawing.Point(371, 12);
+            this.panelBarras.Location = new System.Drawing.Point(12, 12);
             this.panelBarras.Name = "panelBarras";
             this.panelBarras.Size = new System.Drawing.Size(710, 509);
             this.panelBarras.TabIndex = 0;
@@ -55,44 +58,83 @@
             // 
             this.timerBarras.Enabled = true;
             this.timerBarras.Interval = 30;
-            this.timerBarras.Tick += new System.EventHandler(this.timerBarras_Tick);
             // 
             // axWindowsMediaPlayer1
             // 
             this.axWindowsMediaPlayer1.Enabled = true;
-            this.axWindowsMediaPlayer1.Location = new System.Drawing.Point(12, 12);
+            this.axWindowsMediaPlayer1.Location = new System.Drawing.Point(12, 527);
             this.axWindowsMediaPlayer1.Name = "axWindowsMediaPlayer1";
             this.axWindowsMediaPlayer1.OcxState = ((System.Windows.Forms.AxHost.State)(resources.GetObject("axWindowsMediaPlayer1.OcxState")));
-            this.axWindowsMediaPlayer1.Size = new System.Drawing.Size(353, 509);
+            this.axWindowsMediaPlayer1.Size = new System.Drawing.Size(710, 125);
             this.axWindowsMediaPlayer1.TabIndex = 2;
             this.axWindowsMediaPlayer1.PlayStateChange += new AxWMPLib._WMPOCXEvents_PlayStateChangeEventHandler(this.axWindowsMediaPlayer1_PlayStateChange);
             // 
             // btnExit
             // 
             this.btnExit.Image = ((System.Drawing.Image)(resources.GetObject("btnExit.Image")));
-            this.btnExit.Location = new System.Drawing.Point(1015, 527);
+            this.btnExit.Location = new System.Drawing.Point(1015, 574);
             this.btnExit.Name = "btnExit";
             this.btnExit.Size = new System.Drawing.Size(63, 74);
             this.btnExit.TabIndex = 4;
             this.btnExit.UseVisualStyleBackColor = true;
+            this.btnExit.Click += new System.EventHandler(this.btnExit_Click);
             // 
             // btnLoadFile
             // 
             this.btnLoadFile.BackColor = System.Drawing.Color.WhiteSmoke;
             this.btnLoadFile.Image = global::Windows_Media_Player___Proyecto_Unidad_1.Properties.Resources.loadfile;
-            this.btnLoadFile.Location = new System.Drawing.Point(934, 527);
+            this.btnLoadFile.Location = new System.Drawing.Point(729, 433);
             this.btnLoadFile.Name = "btnLoadFile";
             this.btnLoadFile.Size = new System.Drawing.Size(75, 74);
             this.btnLoadFile.TabIndex = 3;
             this.btnLoadFile.UseVisualStyleBackColor = false;
             this.btnLoadFile.Click += new System.EventHandler(this.btnLoadFile_Click);
             // 
+            // lstboxSongsList
+            // 
+            this.lstboxSongsList.BackColor = System.Drawing.Color.Silver;
+            this.lstboxSongsList.Font = new System.Drawing.Font("Sitka Banner", 8.830188F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lstboxSongsList.ForeColor = System.Drawing.Color.Blue;
+            this.lstboxSongsList.FormattingEnabled = true;
+            this.lstboxSongsList.HorizontalScrollbar = true;
+            this.lstboxSongsList.ItemHeight = 19;
+            this.lstboxSongsList.Location = new System.Drawing.Point(729, 46);
+            this.lstboxSongsList.Name = "lstboxSongsList";
+            this.lstboxSongsList.Size = new System.Drawing.Size(349, 365);
+            this.lstboxSongsList.TabIndex = 5;
+            this.lstboxSongsList.SelectedIndexChanged += new System.EventHandler(this.lstboxSongsList_SelectedIndexChanged);
+            // 
+            // lblSongsList
+            // 
+            this.lblSongsList.AutoSize = true;
+            this.lblSongsList.Font = new System.Drawing.Font("Sitka Banner", 14.26415F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblSongsList.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(224)))), ((int)(((byte)(224)))), ((int)(((byte)(224)))));
+            this.lblSongsList.Location = new System.Drawing.Point(729, 13);
+            this.lblSongsList.Name = "lblSongsList";
+            this.lblSongsList.Size = new System.Drawing.Size(159, 30);
+            this.lblSongsList.TabIndex = 6;
+            this.lblSongsList.Text = "Lista de canciones";
+            // 
+            // btnUpdateList
+            // 
+            this.btnUpdateList.Font = new System.Drawing.Font("Sitka Banner", 10.18868F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnUpdateList.Location = new System.Drawing.Point(951, 433);
+            this.btnUpdateList.Name = "btnUpdateList";
+            this.btnUpdateList.Size = new System.Drawing.Size(127, 52);
+            this.btnUpdateList.TabIndex = 7;
+            this.btnUpdateList.Text = "Actualizar Lista";
+            this.btnUpdateList.UseVisualStyleBackColor = true;
+            this.btnUpdateList.Click += new System.EventHandler(this.btnUpdateList_Click);
+            // 
             // frmPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(64)))), ((int)(((byte)(64)))), ((int)(((byte)(64)))));
-            this.ClientSize = new System.Drawing.Size(1090, 607);
+            this.ClientSize = new System.Drawing.Size(1090, 660);
+            this.Controls.Add(this.btnUpdateList);
+            this.Controls.Add(this.lblSongsList);
+            this.Controls.Add(this.lstboxSongsList);
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnLoadFile);
             this.Controls.Add(this.axWindowsMediaPlayer1);
@@ -105,6 +147,7 @@
             this.TransparencyKey = System.Drawing.Color.White;
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -115,6 +158,9 @@
         private System.Windows.Forms.Timer timerBarras;
         private System.Windows.Forms.Button btnLoadFile;
         private System.Windows.Forms.Button btnExit;
+        private System.Windows.Forms.ListBox lstboxSongsList;
+        private System.Windows.Forms.Label lblSongsList;
+        private System.Windows.Forms.Button btnUpdateList;
     }
 }
 
