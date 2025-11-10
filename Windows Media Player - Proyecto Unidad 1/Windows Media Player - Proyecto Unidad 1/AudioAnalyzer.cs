@@ -1,11 +1,13 @@
-﻿using NAudio.Wave;
+﻿using NAudio.Dsp; // para FFT(Transformadas de fourier) - extrae el espectro de frecuencias
+using NAudio.Wave;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NAudio.Dsp; // para FFT(Transformadas de fourier) - extrae el espectro de frecuencias
+
+using NAudio.CoreAudioApi;// Para procesar el sonido
 
 namespace Windows_Media_Player___Proyecto_Unidad_1
 {
@@ -21,6 +23,19 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
         public AudioAnalyzer()
         {
             FrequencyBands = new float[30]; // 16 barras por defecto
+
+            //
+            try
+            {
+                // Captura el dispositivo de salida por defecto (altavoces)
+                var enumerator = new MMDeviceEnumerator();
+                device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
+            }
+            catch
+            {
+                device = null;
+            }
+            ///
         }
 
         public void Start(string filePath)
@@ -99,6 +114,21 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
                 catch { /* Ignorar errores si se intenta saltar fuera del rango */ }
             }
         }
+
+        //
+        private MMDevice device;
+
+        // Devuelve la amplitud promedio actual del sonido (0 a 1)
+        public float ObtenerIntensidad()
+        {
+            if (device == null)
+                return 0.0f;
+
+            // PeakValue es el volumen actual (rango 0.0 - 1.0)
+            float valor = device.AudioMeterInformation.MasterPeakValue;
+            return valor;
+        }
+        //
 
     }
 

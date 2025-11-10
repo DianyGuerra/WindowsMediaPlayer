@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Windows_Media_Player___Proyecto_Unidad_1.Visualizer;
 
 
 
@@ -18,16 +19,53 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
         private List<ItemSong> songsList = new List<ItemSong>();  // Lista interna para almacenar las canciones
         /*AudioAnalyzer analyzer = new AudioAnalyzer();*/
 
+        //
+        private AudioVisualizer visualizer;
+        private float intensidad = 0.5f;
+        private Timer timerVisualizacion;
+        private AudioAnalyzer analyzer;
+        //
 
         public frmPrincipal()
         {
             InitializeComponent();
+
+            // Necesario para evitar parpadeo en los efectos
+            typeof(Panel).GetProperty("DoubleBuffered", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)
+    .SetValue(panelEfectos, true, null);
+
+            // Crea el timer ANTES de que el reproductor empiece a disparar eventos
+            timerVisualizacion = new Timer();
+            timerVisualizacion.Interval = 40;
+            timerVisualizacion.Tick += TimerVisualizacion_Tick;
+
+            analyzer = new AudioAnalyzer();
+            //
+
+
             axWindowsMediaPlayer1.settings.autoStart = false; //No reproducir automáticamente
 
             LoadSongs(); // carga automática al iniciar
 
             
             lstboxSongsList.SelectedIndexChanged += lstboxSongsList_SelectedIndexChanged;  // Suscribirse al evento de cambio de selección
+
+            //
+            // Inicializar visualizador
+            visualizer = new AudioVisualizer();
+
+            foreach (var efecto in visualizer.ObtenerEfectos())
+                comboBoxEfectos.Items.Add(efecto.Nombre);
+
+            comboBoxEfectos.SelectedIndex = 0;
+            comboBoxEfectos.SelectedIndexChanged += comboBoxEfectos_SelectedIndexChanged;
+
+            // Vincular el evento DESPUÉS de inicializar todo
+            axWindowsMediaPlayer1.PlayStateChange += axWindowsMediaPlayer1_PlayStateChange;
+
+            // Suscribir al Paint (por si no lo has hecho en el diseñador)
+            panelEfectos.Paint += panelEfectos_Paint;
+            //
 
         }
 
@@ -49,6 +87,13 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
                     //analyzer.Stop();           // detener análisis
                     break;
             }
+
+            // Responsables del movimiento de las barras mediante el timer
+            if (axWindowsMediaPlayer1.playState == WMPLib.WMPPlayState.wmppsPlaying)
+                timerVisualizacion.Start();
+            else
+                timerVisualizacion.Stop();
+            //
         }
 
         //Metodo para cargar un archivo de audio específico
@@ -124,7 +169,25 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
             {
                 MessageBox.Show("Error al cargar las canciones: " + ex.Message);
             }
-        } 
+        }
 
+
+        //
+        private void comboBoxEfectos_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            visualizer.CambiarEfecto(comboBoxEfectos.SelectedIndex);
+        }
+
+        private void panelEfectos_Paint(object sender, PaintEventArgs e)
+        {
+            visualizer.Dibujar(e.Graphics, panelEfectos.ClientRectangle, intensidad);
+        }
+
+        private void TimerVisualizacion_Tick(object sender, EventArgs e)
+        {
+            intensidad = Math.Min(1.0f, analyzer.ObtenerIntensidad() * 2.5f); // ← sincronizado con el sonido real
+            panelEfectos.Invalidate();
+        }
+        //
     }
 }
