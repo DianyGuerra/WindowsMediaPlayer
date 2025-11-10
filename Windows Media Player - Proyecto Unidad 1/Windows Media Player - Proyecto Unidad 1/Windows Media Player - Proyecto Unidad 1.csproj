@@ -78,6 +78,7 @@
   <ItemGroup>
     <Compile Include="AudioAnalyzer.cs" />
     <Compile Include="AudioVisualizer.cs" />
+    <Compile Include="EfectoSol.cs" />
     <Compile Include="EfectoVisual.cs" />
     <Compile Include="EfectoBarras.cs" />
     <Compile Include="frmPrincipal.cs">

@@ -19,7 +19,7 @@ namespace Windows_Media_Player___Proyecto_Unidad_1.Visualizer
             efectos = new List<EfectoVisual>()
             {
                 new EfectoBarras(),
-                
+                new EfectoSol(),
             };
 
             efectoActual = efectos[0];
