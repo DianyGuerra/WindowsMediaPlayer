@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Windows_Media_Player___Proyecto_Unidad_1.Visualizations;
 
 
 
@@ -16,7 +17,10 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
     public partial class frmPrincipal : Form
     {
         private List<ItemSong> songsList = new List<ItemSong>();  // Lista interna para almacenar las canciones
-        /*AudioAnalyzer analyzer = new AudioAnalyzer();*/
+        AudioAnalyzer analyzer = new AudioAnalyzer();
+
+        private BaseVisualizer currentVisualizer;
+
 
 
         public frmPrincipal()
@@ -24,10 +28,26 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
             InitializeComponent();
             axWindowsMediaPlayer1.settings.autoStart = false; //No reproducir automáticamente
 
-            LoadSongs(); // carga automática al iniciar
-
-            
+            LoadSongs(); // carga automática al iniciar la aplicación
             lstboxSongsList.SelectedIndexChanged += lstboxSongsList_SelectedIndexChanged;  // Suscribirse al evento de cambio de selección
+
+            timerVisualizer.Interval = 30; // ~33 fps
+            timerVisualizer.Tick += (s, e) => panelVisualizer.Invalidate();
+            timerVisualizer.Start();
+
+            currentVisualizer = new SunVisualizer(); // animación activa por defecto
+
+            panelVisualizer.Paint += (s, e) =>
+            {
+                if (currentVisualizer != null && analyzer != null)
+                    currentVisualizer.Draw(e.Graphics, analyzer, panelVisualizer.ClientRectangle);
+            };
+
+            typeof(Panel).InvokeMember("DoubleBuffered",
+            System.Reflection.BindingFlags.SetProperty |
+            System.Reflection.BindingFlags.Instance |
+            System.Reflection.BindingFlags.NonPublic,
+            null, panelVisualizer, new object[] { true });
 
         }
 
@@ -38,7 +58,7 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
             switch (axWindowsMediaPlayer1.playState)
             {
                 case WMPLib.WMPPlayState.wmppsPlaying:// reproducir
-                    //analyzer.IsPaused = false; // reanudar análisis
+                    analyzer.Start();
                     break;
 
                 case WMPLib.WMPPlayState.wmppsPaused:// pausar
@@ -46,7 +66,7 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
                     break;
 
                 case WMPLib.WMPPlayState.wmppsStopped:// detener
-                    //analyzer.Stop();           // detener análisis
+                    analyzer.Stop();   // detener captura
                     break;
             }
         }
@@ -124,7 +144,7 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
             {
                 MessageBox.Show("Error al cargar las canciones: " + ex.Message);
             }
-        } 
+        }
 
     }
 }

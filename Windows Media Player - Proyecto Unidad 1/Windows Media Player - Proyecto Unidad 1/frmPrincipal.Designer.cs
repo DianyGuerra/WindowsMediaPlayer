@@ -30,34 +30,29 @@
         {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(frmPrincipal));
-            this.panelBarras = new System.Windows.Forms.Panel();
+            this.panelVisualizer = new System.Windows.Forms.Panel();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
-            this.timerBarras = new System.Windows.Forms.Timer(this.components);
             this.axWindowsMediaPlayer1 = new AxWMPLib.AxWindowsMediaPlayer();
             this.btnExit = new System.Windows.Forms.Button();
             this.btnLoadFile = new System.Windows.Forms.Button();
             this.lstboxSongsList = new System.Windows.Forms.ListBox();
             this.lblSongsList = new System.Windows.Forms.Label();
             this.btnUpdateList = new System.Windows.Forms.Button();
+            this.timerVisualizer = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.axWindowsMediaPlayer1)).BeginInit();
             this.SuspendLayout();
             // 
-            // panelBarras
+            // panelVisualizer
             // 
-            this.panelBarras.BackColor = System.Drawing.Color.Black;
-            this.panelBarras.Location = new System.Drawing.Point(12, 12);
-            this.panelBarras.Name = "panelBarras";
-            this.panelBarras.Size = new System.Drawing.Size(710, 509);
-            this.panelBarras.TabIndex = 0;
+            this.panelVisualizer.BackColor = System.Drawing.Color.Black;
+            this.panelVisualizer.Location = new System.Drawing.Point(12, 12);
+            this.panelVisualizer.Name = "panelVisualizer";
+            this.panelVisualizer.Size = new System.Drawing.Size(710, 509);
+            this.panelVisualizer.TabIndex = 0;
             // 
             // openFileDialog1
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
-            // 
-            // timerBarras
-            // 
-            this.timerBarras.Enabled = true;
-            this.timerBarras.Interval = 30;
             // 
             // axWindowsMediaPlayer1
             // 
@@ -126,6 +121,9 @@
             this.btnUpdateList.UseVisualStyleBackColor = true;
             this.btnUpdateList.Click += new System.EventHandler(this.btnUpdateList_Click);
             // 
+            // timerVisualizer
+            // 
+            // 
             // frmPrincipal
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -138,7 +136,7 @@
             this.Controls.Add(this.btnExit);
             this.Controls.Add(this.btnLoadFile);
             this.Controls.Add(this.axWindowsMediaPlayer1);
-            this.Controls.Add(this.panelBarras);
+            this.Controls.Add(this.panelVisualizer);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "frmPrincipal";
@@ -152,15 +150,15 @@
         }
 
         #endregion
-        private System.Windows.Forms.Panel panelBarras;
+        private System.Windows.Forms.Panel panelVisualizer;
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private AxWMPLib.AxWindowsMediaPlayer axWindowsMediaPlayer1;
-        private System.Windows.Forms.Timer timerBarras;
         private System.Windows.Forms.Button btnLoadFile;
         private System.Windows.Forms.Button btnExit;
         private System.Windows.Forms.ListBox lstboxSongsList;
         private System.Windows.Forms.Label lblSongsList;
         private System.Windows.Forms.Button btnUpdateList;
+        private System.Windows.Forms.Timer timerVisualizer;
     }
 }
 

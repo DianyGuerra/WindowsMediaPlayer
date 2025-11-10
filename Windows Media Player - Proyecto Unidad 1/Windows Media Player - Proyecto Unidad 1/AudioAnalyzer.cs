@@ -5,102 +5,103 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using NAudio.Dsp; // para FFT(Transformadas de fourier) - extrae el espectro de frecuencias
+using NAudio.Dsp; // para FFT(Transformadas de fourier) - extrae el espectro de frecuencia
 
 namespace Windows_Media_Player___Proyecto_Unidad_1
 {
     internal class AudioAnalyzer
     {
-        private AudioFileReader reader;
-        private Thread analyzeThread;
-        private bool isRunning = false;
+        private WasapiLoopbackCapture capture;
+        private const int fftSize = 1024;
+        private readonly Complex[] complexBuffer = new Complex[fftSize];
+        private readonly float[] sampleBuffer = new float[fftSize];
+        private int sampleIndex = 0;
 
-        public bool IsPaused { get; set; } = false;
-        public float[] FrequencyBands { get; private set; } // valores para las barras
+        public float Amplitude { get; private set; }
+        public float[] FrequencyBands { get; private set; } = new float[32];
 
-        public AudioAnalyzer()
+        public bool IsRunning { get; private set; }
+
+        public void Start()
         {
-            FrequencyBands = new float[30]; // 16 barras por defecto
+            if (IsRunning) return;
+
+            capture = new WasapiLoopbackCapture();
+            capture.DataAvailable += OnDataAvailable;
+            capture.StartRecording();
+            IsRunning = true;
         }
 
-        public void Start(string filePath)
+        private void OnDataAvailable(object sender, WaveInEventArgs e)
         {
-            Stop(); // por si ya había un análisis previo
+            int bytesPerSample = capture.WaveFormat.BitsPerSample / 8;
+            int sampleCount = e.BytesRecorded / bytesPerSample;
+            float sum = 0f;
 
-            reader = new AudioFileReader(filePath);
-            isRunning = true;
-
-            analyzeThread = new Thread(() =>
+            for (int i = 0; i < sampleCount; i++)
             {
-                int fftLength = 1024; // tamaño de FFT, potencia de 2
-                Complex[] fftBuffer = new Complex[fftLength];
-                float[] sampleBuffer = new float[fftLength];
+                float sample = BitConverter.ToInt16(e.Buffer, i * bytesPerSample) / 32768f;
 
-                while (isRunning && reader != null)
+                // RMS
+                sum += sample * sample;
+
+                // FFT buffer
+                sampleBuffer[sampleIndex] = sample;
+                complexBuffer[sampleIndex].X = sample;
+                complexBuffer[sampleIndex].Y = 0;
+
+                sampleIndex++;
+                if (sampleIndex >= fftSize)
                 {
-                    if (IsPaused)
-                    {
-                        Thread.Sleep(100);
-                        continue;
-                    }
-
-                    int read = reader.Read(sampleBuffer, 0, fftLength);
-                    if (read == 0) break;
-
-                    // Copiar las muestras al buffer FFT
-                    for (int i = 0; i < fftLength; i++)
-                    {
-                        fftBuffer[i].X = (float)(sampleBuffer[i] * FastFourierTransform.HammingWindow(i, fftLength));
-                        fftBuffer[i].Y = 0;
-                    }
-
-                    // Aplicar FFT
-                    FastFourierTransform.FFT(true, (int)Math.Log(fftLength, 2.0), fftBuffer);
-
-                    // Calcular magnitud por banda
-                    int bands = FrequencyBands.Length;
-                    for (int b = 0; b < bands; b++)
-                    {
-                        int start = (int)(Math.Pow(2, b * (10.0 / bands)));
-                        int end = Math.Min((int)(Math.Pow(2, (b + 1) * (10.0 / bands))), fftLength / 2);
-
-                        float sum = 0;
-                        for (int i = start; i < end; i++)
-                        {
-                            float mag = (float)Math.Sqrt(fftBuffer[i].X * fftBuffer[i].X + fftBuffer[i].Y * fftBuffer[i].Y);
-                            sum += mag;
-                        }
-
-                        FrequencyBands[b] = sum / (end - start + 1);
-                    }
-
-                    Thread.Sleep(4);
+                    // Calcular FFT
+                    FastFourierTransform.FFT(true, (int)Math.Log(fftSize, 2.0), complexBuffer);
+                    ComputeFrequencyBands();
+                    sampleIndex = 0;
                 }
-            });
+            }
 
-            analyzeThread.Start();
+            float amp = (float)Math.Sqrt(sum / sampleCount);
+
+            // 🔹 Amplificar un poco los valores medios y bajos
+            amp *= 1.4f; // puedes probar 1.5f – 2.5f
+
+            // 🔹 Aplicar una ligera curva logarítmica para que los cambios sean más notorios
+            Amplitude = (float)Math.Log10(1 + amp * 9f);
+
+            // 🔹 Limitar por seguridad (evita valores mayores a 1)
+            if (Amplitude > 1f) Amplitude = 1f;
+
+        }
+
+        private void ComputeFrequencyBands()
+        {
+            // 32 bandas de frecuencia promediadas
+            for (int i = 0; i < FrequencyBands.Length; i++)
+            {
+                int start = (int)(i * (fftSize / 2) / FrequencyBands.Length);
+                int end = (int)((i + 1) * (fftSize / 2) / FrequencyBands.Length);
+
+                float avg = 0f;
+                for (int j = start; j < end; j++)
+                {
+                    avg += (float)Math.Sqrt(complexBuffer[j].X * complexBuffer[j].X + complexBuffer[j].Y * complexBuffer[j].Y);
+                }
+                FrequencyBands[i] = avg / (end - start);
+            }
         }
 
         public void Stop()
         {
-            isRunning = false;
-            reader?.Dispose();
-            analyzeThread?.Join();
-        }
+            if (!IsRunning) return;
 
-        public void SyncPosition(double seconds)
-        {
-            if (reader != null)
-            {
-                try
-                {
-                    reader.CurrentTime = TimeSpan.FromSeconds(seconds);
-                }
-                catch { /* Ignorar errores si se intenta saltar fuera del rango */ }
-            }
+            capture.StopRecording();
+            capture.Dispose();
+            capture = null;
+            IsRunning = false;
         }
-
     }
 
-
 }
+
+
+
