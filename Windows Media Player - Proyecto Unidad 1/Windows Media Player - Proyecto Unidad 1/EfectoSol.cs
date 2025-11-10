@@ -13,7 +13,7 @@ namespace Windows_Media_Player___Proyecto_Unidad_1
     {
         private float radioSuavizado = 0f; // efecto glow del círculo
         private float velocidad = 0f;  // velocidad de crecimiento del sol
-        private float amortiguacion = 0.20f;  //sensibilidad del movimiento (mayor = más sensible)
+        private float amortiguacion = 0.7f;  //sensibilidad del movimiento (mayor = más sensible)
         private float elasticidad = 0.35f;   // factor de elasticidad del círculo (menor = más elástico)
         private float baseRadio = 50f;  // tamaño base del sol
         private Random rnd = new Random();
